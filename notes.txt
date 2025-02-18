@@ -1,0 +1,15 @@
+id -u
+id -g
+id -G
+groupmod -n NEW_GROUP CURRENT_GROUP # change CURRENT_GROUP to NEW_GROUP
+getent group CURRENT_GROUP # read CURRENT_GROUP from group section of database
+getent group # echo /etc/group
+usermod -g NEW_GROUP CURRENT_GROUP # change primary group
+compgen -g # list all groups
+usermod -aG users $USER # add yourself to "users" group
+usermod -g users $USER  # set primary group to "users"
+groupdel OLD_GROUP # delete OLD_GROUP from groups (/etc/group)
+chgrp NEW_GROUP /path/to/file # change group ownership
+chgrp --recursive NEW_GROUP /path/to/dir
+find /path/to/dir -group OLD_GROUP -exec chgrp NEW_GROUP {} +
+find /path/to/dir -path /dir/to/skip -prune -o -print # -o: OR -prune: SKIP

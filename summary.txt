@@ -1,0 +1,17 @@
+$VIMRUNTIME
+$XDG_CONFIG_HOME
+$XDG_CONFIG_DIRS
+$XDG_DATA_HOME
+$XDG_DATA_DIRS
+
+stdpath()
+vim.fn.stdpath()
+
+config 		~/.config/nvim
+config_dirs	/etc/xdg/nvim
+data		~/.local/share/nvim
+data_dirs 	~/.local/share/flatpak/exports/share/nvim, /var/lib/flatpak/exports/share/nvim, /usr/local/share/nvim, /usr/share/nvim
+logA		~/.local/state/nvim
+state 		~/.local/state/nvim
+run		/run/user/1000
+cache		~/.cache/nvim

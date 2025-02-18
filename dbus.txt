@@ -1,0 +1,7 @@
+Asking D-Bus to list services we can communicate with:
+1. dbus-send
+dbus-send --session --dest=org.freedesktop.DBus --type=method_call --print-reply /org/freedesktop/DBus org.freedesktop.DBus.ListNames
+
+2. busctl
+
+3. gdbus

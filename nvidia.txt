@@ -1,0 +1,28 @@
+# Using NVIDIA graphics card for specific application
+# On GNOME systems (Xorg or Wayland display manager)
+# On desktop entry of the App (e.g. /usr/share/applications/App.desktop) enter following line
+
+PrefersNonDefaultGPU=true
+
+# Log out of the system and log back in
+# Launch App using the desktop launch icon
+# Check with `nvidia-smi` your App should be listed under applications running under NVIDIA GPU
+# If this does not work you will have to try to launch application with environment variables set in a certain way
+# Create following wrapper script in system PATH and make it executable
+
+#!/bin/sh
+export __NV_PRIME_RENDER_OFFLOAD=1
+export __GLX_VENDOR_LIBRARY_NAME=nvidia
+exec MyApp
+
+# Now change desktop entry's `Exec` line to point to the wrapper script instead
+# Try logging out and back in and launching MyApp from desktop icon
+
+# If you're on a terminal emulator (e.g. Kitty, Alacritty) launched with NVIDIA following command should show that
+
+glxinfo | grep 'OpenGL'
+
+# output has "NVIDIA" under "OpenGL vendor string" and "OpenGL renderer string"
+
+# If it does not work or in a terminal emulator launched with in-build (shared) Intel graphics GPU command output
+# shows "Intel ... graphics..." instead

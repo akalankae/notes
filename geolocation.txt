@@ -1,0 +1,201 @@
+** Excerpts from conversation with Llama-3.0 70bn **
+
+There are several ways a programmer can find out the time of sunset and sunrise from a location. Here are a few methods:
+
+* **Use a Geolocation API**: Many geolocation APIs, such as Google Maps or OpenCage Geocoder, provide information about sunrise and sunset times for a given location. These APIs typically require a latitude and longitude as input and return the sunrise and sunset times in a format such as UTC or local time.
+* **Use an Astronomy API**: APIs like the United States Naval Observatory's Data Services or the Sunrise-Sunset API provide detailed information about astronomical events, including sunrise and sunset times. These APIs often require a latitude, longitude, and date as input.
+* **Calculate it manually**: Programmers can also calculate sunrise and sunset times manually using formulas that take into account the location's latitude, longitude, and time zone. This method requires a good understanding of astronomy and trigonometry.
+
+Some popular APIs for finding sunrise and sunset times include:
+
+* Sunrise-Sunset API (free, with optional paid upgrades)
+* OpenWeatherMap API (free, with optional paid upgrades)
+* Google Maps API (paid)
+* United States Naval Observatory's Data Services (free)
+
+To calculate sunrise and sunset times manually, programmers can use the following formulas:
+
+* **Solar Declination**: $$\delta = 23.45^\circ \sin\left(360^\circ \frac{284 + n}{365}\right)$$, where n is the day of the year (January 1 = 1, February 1 = 32, etc.)
+* **Equation of Time**: $$\Delta t = 229.2 \left(0.000075 + 0.001868 \cos\left(360^\circ \frac{n}{365}\right) - 0.032077 \sin\left(360^\circ \frac{n}{365}\right) - 0.014615 \cos\left(720^\circ \frac{n}{365}\right) - 0.04089 \sin\left(720^\circ \frac{n}{365}\right)\right)$$
+* **Sunrise and Sunset Times**: $$t_{sunrise} = 12 - \frac{1}{15} \arccos\left(-\tan\left(\phi\right) \tan\left(\delta\right)\right) - \frac{\Delta t}{60}$$, $$t_{sunset} = 12 + \frac{1}{15} \arccos\left(-\tan\left(\phi\right) \tan\left(\delta\right)\right) - \frac{\Delta t}{60}$$, where φ is the latitude and δ is the solar declination.
+
+Note that these formulas assume a simplified model of the Earth's orbit and do not account for atmospheric refraction or other factors that can affect sunrise and sunset times.
+
+Geoclue and geocode-glib-2 are libraries that provide geolocation and geocoding functionality, but they are not directly designed to provide sunrise and sunset times.
+
+Geoclue is a D-Bus service that provides location information, including latitude, longitude, and altitude. It can be used to get the current location of a device, but it does not provide sunrise and sunset times.
+
+Geocode-glib-2 is a library that provides geocoding functionality, which is the process of converting a human-readable address into a set of geographic coordinates (latitude and longitude). It can be used to get the coordinates of a location, but it does not provide sunrise and sunset times.
+
+However, you can use these libraries to get the location's coordinates and then use those coordinates to calculate the sunrise and sunset times using the formulas I provided earlier.
+
+For example, you can use Geoclue to get the current location's coordinates and then use those coordinates to calculate the sunrise and sunset times using a library like libastro or by implementing the formulas yourself.
+
+Here's an example of how you might use Geoclue and geocode-glib-2 to get the coordinates of a location and then calculate the sunrise and sunset times:
+```c
+#include <geoclue/geoclue.h>
+#include <geocode-glib/geocode-glib.h>
+
+// Get the current location's coordinates using Geoclue
+GeoclueClient *client = geoclue_client_new();
+GeoclueLocation *location = geoclue_client_get_location(client);
+double latitude = geoclue_location_get_latitude(location);
+double longitude = geoclue_location_get_longitude(location);
+
+// Use geocode-glib-2 to get the coordinates of a location
+GeocodeGlibGeocoder *geocoder = geocode_glib_geocoder_new();
+GeocodeGlibPlace *place = geocode_glib_geocoder_reverse_geocode(geocoder, latitude, longitude);
+double latitude = geocode_glib_place_get_latitude(place);
+double longitude = geocode_glib_place_get_longitude(place);
+
+// Calculate the sunrise and sunset times using the coordinates
+// ( implementation of the formulas goes here )
+```
+Note that this is just an example and you will need to implement the formulas to calculate the sunrise and sunset times yourself.
+
+To calculate sunrise and sunset times, you only need to know the latitude of the location, not the longitude. The longitude is not necessary because the sunrise and sunset times are determined by the Earth's rotation and the tilt of its axis, which are the same for all locations at the same latitude.
+
+The longitude is only necessary if you want to calculate the local time of sunrise and sunset, because the longitude determines the time zone. But if you're only interested in the solar time (i.e., the time relative to the sun's position in the sky), then the latitude is sufficient.
+
+So, to calculate sunrise and sunset times, you can use the formulas I provided earlier, which only require the latitude and the day of the year (or the solar declination).
+
+Yes, you can use Geoclue or geocode-glib-2 to determine the local time zone.
+
+Geoclue provides a `GeoclueLocation` object that contains information about the location, including the time zone. You can use the `geoclue_location_get_timezone` function to get the time zone as a string.
+
+Geocode-glib-2 provides a `GeocodeGlibPlace` object that contains information about the location, including the time zone. You can use the `geocode_glib_place_get_timezone` function to get the time zone as a string.
+
+Both of these functions will return the time zone as a string in the format "Continent/City" (e.g. "America/New_York").
+
+Once you have the time zone, you can use it to convert the solar time (i.e., the time relative to the sun's position in the sky) to the local time.
+
+Here's an example of how you might use Geoclue to get the time zone:
+```c
+GeoclueClient *client = geoclue_client_new();
+GeoclueLocation *location = geoclue_client_get_location(client);
+const char *timezone = geoclue_location_get_timezone(location);
+```
+And here's an example of how you might use geocode-glib-2 to get the time zone:
+```c
+GeocodeGlibGeocoder *geocoder = geocode_glib_geocoder_new();
+GeocodeGlibPlace *place = geocode_glib_geocoder_reverse_geocode(geocoder, latitude, longitude);
+const char *timezone = geocode_glib_place_get_timezone(place);
+```
+Based on various metrics, here's a comparison of geoclue and geocode-glib-2:
+
+**Popularity:**
+Geoclue is more popular than geocode-glib-2. Geoclue is a part of the GNOME project and is widely used in many Linux distributions, including Ubuntu, Fedora, and openSUSE. Geocode-glib-2, on the other hand, is a smaller project with a more limited user base.
+
+**Functionality:**
+Geoclue has more functionality than geocode-glib-2. Geoclue provides a wide range of features, including:
+
+* Location detection using various methods (e.g., GPS, Wi-Fi, cellular)
+* Geocoding (converting addresses to coordinates)
+* Reverse geocoding (converting coordinates to addresses)
+* Time zone detection
+* Altitude detection
+* Speed and direction detection
+
+Geocode-glib-2, on the other hand, is primarily focused on geocoding and reverse geocoding.
+
+**Efficiency:**
+Geoclue is generally more efficient than geocode-glib-2. Geoclue uses a variety of techniques to minimize power consumption and reduce the number of requests made to external services. Geocode-glib-2, while efficient, may make more requests to external services, which can impact performance.
+
+**Security:**
+Both geoclue and geocode-glib-2 have good security track records. However, geoclue has a more comprehensive security framework, which includes features like:
+
+* Support for secure protocols (e.g., HTTPS)
+* Encryption of sensitive data
+* Access control mechanisms to restrict access to location data
+
+Geocode-glib-2 also supports secure protocols and encryption, but its security framework is not as comprehensive as geoclue's.
+
+In summary, geoclue is more popular, has more functionality, and is more efficient than geocode-glib-2. Geoclue also has a more comprehensive security framework, making it a better choice for applications that require robust location detection and geocoding capabilities.
+
+# Feb 10, 2025
+# Excerpt from GPT O-mini
+Question:
+How to query geoclue.service about current latitude, longitude and time zone?
+
+Answer:
+Geoclue is a D‑Bus–based location service that lets client applications request location information. It doesn’t provide a “query” command per se but rather a well‐defined D‑Bus API that you can call into to get location data such as latitude and longitude. (It doesn’t directly return the time zone—if you need that you must translate lat/lon into a time zone using an external service or library.)
+
+Below are some guidelines for how you might query geoclue via its D‑Bus interface:
+
+1. Understand the API:  
+ • Geoclue2 (the current version) exposes a service at the D‑Bus name org.freedesktop.GeoClue2.  
+ • You typically have to create a “client” by calling the CreateClient method on the service. This returns an object path associated with your “session”.  
+ • Once the client is set up, you’ll receive updates on location. The location object (mostly under /org/freedesktop/GeoClue2/Location/<number>) implements the org.freedesktop.GeoClue2.Location interface, which has properties like Latitude, Longitude, and Accuracy.
+
+2. Use D‑Bus tools to inspect properties:  
+For example, you can use the command‑line tool gdbus (or dbus-send) to examine properties on the location object. The typical flow is:  
+ a. Create a client.  
+  For instance, with gdbus call (note that you might need proper setup and permission):  
+   gdbus call --system --dest org.freedesktop.GeoClue2 \
+    --object-path /org/freedesktop/GeoClue2/Manager \
+    --method org.freedesktop.GeoClue2.Manager.CreateClient "{}"  
+  This will return an object path for your client (for example, “/org/freedesktop/GeoClue2/Client/42”).
+
+ b. Optionally, set any needed client properties (like DesktopId) as required by your distro’s geoclue policy. Some installations require that the client provide an application identifier as a “DesktopId” property before the service starts updating the location.
+
+ c. Ask for the location:  
+  Usually, the client’s “Location” property (if already set) will point to a location object. Inspect its properties by:  
+   gdbus introspect --system --dest org.freedesktop.GeoClue2 \
+    --object-path /org/freedesktop/GeoClue2/Location/your-location-id  
+  Replace “your-location-id” with the actual object path you received. Look for properties such as “Latitude” and “Longitude”.
+
+3. Programmatically accessing via a language binding:  
+If you’re writing an application (e.g. in Python), you might use a D‑Bus binding (such as python-dbus). A rough outline in Python might be:
+
+-----------------------------------------------------------
+#!/usr/bin/env python3
+import dbus
+
+# Connect to the system bus
+bus = dbus.SystemBus()
+
+# Get the GeoClue Manager
+manager_obj = bus.get_object("org.freedesktop.GeoClue2", "/org/freedesktop/GeoClue2/Manager")
+manager = dbus.Interface(manager_obj, "org.freedesktop.GeoClue2.Manager")
+
+# Create a client (an empty dict is usually accepted; check your distro’s geoclue docs)
+client_path = manager.CreateClient({})
+client_obj = bus.get_object("org.freedesktop.GeoClue2", client_path)
+client_props = dbus.Interface(client_obj, "org.freedesktop.DBus.Properties")
+
+# (Optional) Set DesktopId if required:
+client_props.Set("org.freedesktop.GeoClue2.Client", "DesktopId", "your.application.id")
+
+# Now, poll the "Location" property. This is an object path
+import time
+while True:
+    location_path = client_props.Get("org.freedesktop.GeoClue2.Client", "Location")
+    if location_path != "/":
+        break
+    time.sleep(0.5)
+
+# Retrieve location information:
+location_obj = bus.get_object("org.freedesktop.GeoClue2", location_path)
+location_props = dbus.Interface(location_obj, "org.freedesktop.DBus.Properties")
+latitude = location_props.Get("org.freedesktop.GeoClue2.Location", "Latitude")
+longitude = location_props.Get("org.freedesktop.GeoClue2.Location", "Longitude")
+accuracy = location_props.Get("org.freedesktop.GeoClue2.Location", "Accuracy")
+print("Latitude:", latitude)
+print("Longitude:", longitude)
+print("Accuracy:", accuracy)
+
+# Note: Geoclue2 does not provide a time zone property.
+-----------------------------------------------------------
+
+4. Getting Time Zone Information:  
+Since geoclue does not include time zone data, you can convert the latitude and longitude to a time zone by using libraries or APIs such as the tzwhere Python library or online geocoding/timezone services (e.g. Google’s Time Zone API, TimeZoneDB, etc).
+
+Summary
+
+• Use D‑Bus (via gdbus, dbus-send, or a language binding) to call org.freedesktop.GeoClue2.Manager.CreateClient to create a client.  
+• Once the client has a valid “Location” object, query its properties (Latitude, Longitude, Accuracy).  
+• For time zone, you need an extra step: use the coordinates with a reverse geocoding/timezone lookup.
+
+The code snippet above is a starting point, but remember that geoclue’s policies (for example, requiring a valid application id) may require additional steps depending on your Linux distribution or desktop environment.
+
+This is how you can query geoclue.service for your current latitude, longitude, and then determine the time zone separately.

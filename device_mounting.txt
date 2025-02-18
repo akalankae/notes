@@ -1,0 +1,140 @@
+services/programs involved:
+0. fstab
+1. udev
+2. systemd (systemd-udevd)
+3. udisks2
+4. gvfs (GNOME virtual file system)
+
+linux-kernel file system drivers
+* makes it possible for OS to read and write to various file systems like ext4,
+  ntfs, fat, ...
+* handles low-level file system operations
+
+fstab
+* static
+* mounts devices/partitions at boot time
+
+udev
+* dynamic
+* device manager for linux-kernel
+* monitors for when new devices are connected
+* when device is connected triggers an EVENT according to predefined set of
+  rules
+* manages device nodes in /dev directory
+* when a new device is connected creates a device node for it in /dev
+
+systemd-udevd
+* systemd is the init system/service manager
+* receives signal from udev and handles it according to a set of rules
+* can execute scripts to perform tasks when a new device is detected
+
+systemd-automount
+* a service related to managing file system
+* can be configured to automount devices
+
+udisks2
+* a daemon that provides a D-bus interface to manage storge devices
+* uses udev events to detect new device and mounts it using gvfs
+
+GNOME virtual file system (GVFS)
+* user space program 
+* creates a layer of abstraction between underlying file system and GNOME 
+  desktop environment
+* provides access to both local and network file systems
+
+gvfs-udisks2
+* backend for gvfs that interacts with udisks2 to handle storge devices
+
+gnome-settings daemon
+* manages settings/configurations including those related to device/file system
+  management
+
+automounting
+- udev and gvfs
+- udev creates node in /dev
+- gvfs then mounts the file system on connected device, so the user of GNOME 
+  desktop can access it
+
+monitoring
+- udev
+- udisks2 and gnome-settings daemon monitor for new devices
+
+? possible sequence of events
+0. a new device is connected to the system
+1. udev detects the connection triggers a device event
+2. systemd-udevd runs a script (set of rules) to notify udisks2
+3. udisks2 mounts the device if it configured to do so and notifies gvfs
+4. gvfs provides the virtual file system for GNOME desktop to access
+
+# Conversation with deepseek about automounting devices on arc linux
+When a USB device is connected to an Arch Linux system running the GNOME desktop, the following steps occur to automatically mount the device under `/run/media/$USER`:
+
+---
+
+### **1. Kernel Detection and Device Initialization**
+- The Linux kernel detects the USB device via its USB controller driver (e.g., `usb-storage`).
+- The kernel identifies the device as a block storage device and creates a corresponding block device file (e.g., `/dev/sdX1`).
+
+---
+
+### **2. udev Event Handling**
+- `systemd-udevd` (the device manager for the kernel) receives a `uevent` from the kernel notifying it of the new device.
+- udev applies rules from `/usr/lib/udev/rules.d` and `/etc/udev/rules.d` to:
+  - Assign consistent device names (e.g., `/dev/disk/by-label/...`).
+  - Set permissions and ownership for the device.
+  - Trigger actions, such as notifying other services via **D-Bus**.
+
+---
+
+### **3. udisks2 Activation**
+- `udisks2` (a userspace daemon for storage management) subscribes to D-Bus signals from udev.
+- When the USB device is detected, `udisks2`:
+  - Queries the device's metadata (e.g., filesystem type, label, UUID).
+  - Checks policies (e.g., whether to auto-mount) based on configuration files in `/etc/udisks2/`.
+
+---
+
+### **4. Automatic Mounting by udisks2**
+- By default, `udisks2` auto-mounts removable media for logged-in users unless configured otherwise (via `/etc/udisks2/udisks2.conf` or overrides in `/etc/fstab`).
+- The device is mounted under `/run/media/$USER/[LABEL_OR_UUID]`:
+  - `$USER` is determined by the active **logind session** (managed by `systemd-logind`).
+  - The directory is created with permissions `0700` (owned by the user).
+- Mounting is performed without `root` privileges using **polkit** policies:
+  - Polkit rules (e.g., `/usr/share/polkit-1/actions/org.freedesktop.UDisks2.policy`) grant permissions to the user's active session.
+
+---
+
+### **5. GNOME Integration**
+- GNOME's **gvfs** (GNOME Virtual File System) layer interacts with `udisks2` over D-Bus to:
+  - Display the device in **GNOME Files (nautilus)**.
+  - Handle user interactions (e.g., unmounting, ejecting).
+- Notifications are sent via **GNOME Shell** to inform the user of the new device.
+
+---
+
+### **6. Unmounting and Removal**
+- When the user ejects the device (or it is unplugged):
+  - `udisks2` unmounts the filesystem and releases the device.
+  - The kernel removes the device node.
+  - GNOME updates the UI to reflect the removal.
+
+---
+
+### **Key Components Involved**
+1. **Kernel Modules**: `usb-storage`, `ehci-hcd`/`xhci-hcd` (USB controllers), filesystem drivers (e.g., `ext4`, `vfat`, `ntfs3`).
+2. **systemd-udevd**: Manages device events and rules.
+3. **udisks2**: Handles mounting/unmounting and D-Bus integration.
+4. **polkit**: Authorizes user actions (e.g., mounting without `root`).
+5. **systemd-logind**: Tracks active user sessions for permissions.
+6. **gvfs/nautilus**: GNOME's integration for user-facing file management.
+
+---
+
+### **Configuration Files**
+- `/etc/udev/rules.d/`: Custom udev rules (rarely needed for basic mounting).
+- `/etc/udisks2/udisks2.conf`: Configures udisks2 behavior (e.g., `mount-options`).
+- `/etc/fstab`: Used for non-removable devices; removable media are ignored unless marked `nofail,x-systemd.automount`.
+
+---
+
+This workflow ensures that USB devices are dynamically and securely mounted with minimal user intervention on Arch Linux + GNOME.
