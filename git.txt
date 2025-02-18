@@ -1,0 +1,33 @@
+# You have a local git repo you want to publish to github for safe-keeping.
+# Log in to github account, open a new git repo in github.
+# You may have created some new files in the github repor (e.g. LICENSE, README) that you do not have in local repo.
+# Go to your local git repo (in terminal) and make sure it does not have a remote repo with;
+git remote -v
+
+# You have inform git to register newly created repo in github as the "remote" repo (aka. "origin") with;
+git remote add origin git@github.com:$USER/$REPO_NAME.git
+# check again with;
+git remote -v
+
+# You can't push local to remote straight-away because remote repo has few files not found in local repo
+# You have to pull these files to local repo before pushing to remote repo.
+# But you can't do this because there is no tracking information for the current branch. You have to specify
+# which branch you want to "merge" with like so;
+git branch --set-upstream-to=origin/$BRANCH_IN_REMOTE  $BRANCH_IN_LOCAL
+
+# First time both of them are probably going to be "master" (or "main")
+# You need to pull those files to local repo, but still can't do this because now the state of 2 git repos are
+# divergent from each other. Git doesn't know how resolve conflicts. You have one of 3 options to proceed;
+git config pull.rebase true # Rebase
+git config pull.rebase false # Merge
+git config pull.ff only     # fast-forward only
+(If you passed --global flag: git config --global pull.X VALUE it will set default preference for all repositories)
+
+# Do the first one, and it should work.
+# Now do a git pull with;
+git pull
+
+# Now it is time to publish local repo to remote github repo
+git push -u origin $BRANCH_NAME
+
+# Check the git log, all should be fine!
