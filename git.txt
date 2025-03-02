@@ -1,6 +1,6 @@
 # You have a local git repo you want to publish to github for safe-keeping.
 # Log in to github account, open a new git repo in github.
-# You may have created some new files in the github repor (e.g. LICENSE, README) that you do not have in local repo.
+# You may have created some new files in the github repo (e.g. LICENSE, README) that you do not have in local repo.
 # Go to your local git repo (in terminal) and make sure it does not have a remote repo with;
 git remote -v
 
