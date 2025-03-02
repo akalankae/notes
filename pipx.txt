@@ -1,0 +1,93 @@
+Question #1:
+Can you get pipx to install packages to local project folder?
+
+Yes, you can use `pipx` to install packages inside a project folder, but it requires a bit
+of additional configuration.
+
+By default, `pipx` installs packages in a global location, typically in a directory like
+`~/.local/bin` (on Unix-like systems) or `%LOCALAPPDATA%\Programs\Python\Pythonxx\Scripts`
+(on Windows). This allows the installed executables to be accessible from anywhere in the
+system.
+
+However, you can configure `pipx` to install packages within a project folder by using the
+`--local-bin-dir` option. Here's how you can do it:
+
+1. Navigate to your project folder in the terminal. 2. Run the following command to create
+a virtual environment for your project:
+```
+pipx --local-bin-dir . install <package-name>
+
+```
+This will install the specified package in a virtual environment within your project
+folder.
+
+3. The executables for the installed package will now be available in the `./bin` (or
+`./Scripts` on Windows) directory within your project folder.
+
+You can also make this the default behavior for `pipx` by setting the
+`PIPX_LOCAL_VENV_DIR` environment variable to the path of your project folder. This way,
+you don't need to specify the `--local-bin-dir` option every time you use `pipx`.
+
+```
+export PIPX_LOCAL_VENV_DIR=.
+pipx install <package-name>
+
+```
+
+This will install the package in a virtual environment within your project folder, and the
+executables will be available in the `./bin` (or `./Scripts`) directory.
+
+Keep in mind that when you use `pipx` with a local virtual environment, the installed
+packages will only be available within that project folder, and not globally on your
+system.
+
+Question #2:
+What are the differences between `pip` and `pipx`?
+
+The main differences between `pip` and `pipx` are:
+
+1. **Scope of Installation**:
+   - `pip` installs Python packages globally, affecting all Python environments on the system.
+   - `pipx` installs Python packages in isolated, self-contained virtual environments, keeping them separate from the system's default Python environment.
+
+2. **Dependency Management**:
+   - `pip` manages dependencies for a specific Python project or environment.
+   - `pipx` manages dependencies for individual applications, ensuring they don't interfere with each other or the system's Python environment.
+
+3. **Executable Management**:
+   - `pip` installs packages, but doesn't automatically add their executables to the system's `PATH`.
+   - `pipx` installs packages and automatically adds their executables to the system's `PATH`, making them easily accessible from the command line.
+
+4. **Isolation**:
+   - `pip` installs packages in the current Python environment, which can lead to conflicts if multiple projects use different versions of the same package.
+   - `pipx` installs each package in a separate, isolated virtual environment, preventing conflicts between different applications.
+
+5. **Uninstallation**:
+   - Uninstalling a package installed with `pip` can be more complex, as it may affect other installed packages.
+   - Uninstalling a package installed with `pipx` is straightforward, as it only affects the isolated virtual environment for that package.
+
+In summary, `pipx` is designed to provide a more robust and isolated way of installing and managing Python applications, while `pip` is better suited for managing dependencies within a specific Python project or environment.
+
+Question #3:
+If I want to set up a virtual environment for a python project so that all dependencies are installed into the project folder, which is the better choice? pip? or pipx?
+
+For setting up a virtual environment with all dependencies installed into the project folder, `pip` is generally the better choice compared to `pipx`.
+Here's why:
+
+1. **Scope of Virtual Environment**:
+   - `pip` is designed to manage dependencies within a specific Python project or environment.
+   - `pipx` is primarily focused on installing and managing individual Python applications in isolated virtual environments, not entire projects.
+
+2. **Dependency Management**:
+   - `pip` provides more robust and flexible dependency management for a project, allowing you to specify and track the exact versions of packages required by your project.
+   - `pipx` is more suited for installing and managing individual applications, not necessarily the full set of dependencies for a project.
+
+3. **Project-specific Configuration**:
+   - `pip` allows you to create a `requirements.txt` file or use a `setup.py` file to specify and install the exact dependencies for your project.
+   - `pipx` doesn't have the same level of project-specific configuration options, as it's focused on installing individual applications.
+
+4. **Virtual Environment Creation**:
+   - `pip` can be used in conjunction with tools like `venv` or `virtualenv` to create and manage virtual environments for your project.
+   - `pipx` creates its own isolated virtual environments, but these are primarily for the installed applications, not for managing a project's full set of dependencies.
+
+So, in summary, if your goal is to set up a virtual environment with all dependencies installed into the project folder, `pip` is the better choice. It provides more flexibility and control over the project's dependencies, making it the more suitable option for managing the development environment for a Python project.
