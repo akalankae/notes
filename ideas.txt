@@ -1,0 +1,17 @@
+# Ideas
+
+# Delete all executable files (ELF files, not just any file with executable bit set) in given directory and its descendants
+
+* Get all files whose executable bit is set
+find DIR -type f -executable
+
+* Get `file` to work on files
+file -i --mime
+file --mime-type (same as --mime-encoding) is better
+
+These give file type "application/x-executable; charset=binary" with --mime option, minus "; charset=binary" with --mime-type option for ELF files.
+This works great because if the file is an executable shared library for example, file output is "application/x-sharedlib; charset=binary" instead of "x-executable".
+This feature can be used to filter output using `sed` command.
+
+Something like...
+find DIR -type f -executable -exec file --mime-type \+ | sed -E -n 's/([^:]+):\s+application\/x-executable/\1/p'
